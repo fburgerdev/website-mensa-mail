@@ -143,6 +143,31 @@
   .card:focus-within { outline: 3px solid var(--green); outline-offset: 3px; }
   .card.about { background: var(--leaf); }
   .card.about.on { background: var(--yellow); }
+
+  /* Bewegung: beim Drüberfahren wackelt der Zettel kurz und hebt sich, beim Ankreuzen ploppt er */
+  @keyframes wiggle {
+    0%   { transform: rotate(var(--tilt, 0deg)) translateY(-3px); }
+    30%  { transform: rotate(calc(var(--tilt, 0deg) * -1.6)) translateY(-3px); }
+    60%  { transform: rotate(calc(var(--tilt, 0deg) * 1.2)) translateY(-3px); }
+    100% { transform: rotate(calc(var(--tilt, 0deg) * -.5)) translateY(-3px); }
+  }
+  @keyframes pop {
+    0%   { transform: rotate(var(--tilt, 0deg)) scale(1); }
+    45%  { transform: rotate(0deg) scale(1.045); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+  @media (hover: hover) {
+    .card:hover:not(.on), .chip:hover:not(.on) {
+      animation: wiggle .45s ease-out forwards;
+      border-color: var(--green);
+    }
+    .card:hover:not(.on) { box-shadow: 5px 8px 0 rgba(31, 93, 52, .2); background: #fff; }
+    .card.about:hover:not(.on) { background: #eef7e8; }
+    .chip:hover:not(.on) { background: var(--yellow-soft); box-shadow: 2px 3px 0 rgba(31, 93, 52, .2); }
+    .card.on:hover, .chip.on:hover { transform: rotate(0deg) translateY(-2px); }
+  }
+  .card.popping, .chip.popping { animation: pop .32s ease-out; }
+  .card:active, .chip:active { transform: rotate(0deg) scale(.97); }
   .about-label { margin: 1.3rem 0 .7rem; font-weight: 700; color: var(--green); font-size: .95rem; }
 
   /* ---------- Der Brief ---------- */
@@ -255,7 +280,7 @@
 
         <section class="step" aria-labelledby="h-good">
           <h2 id="h-good"><span class="num" aria-hidden="true">3</span>Was war gut?</h2>
-          <p class="hint">Kreuz an, was stimmt. Jeder Satz kommt genau so in deine Mail.</p>
+          <p class="hint">Kreuz an, was stimmt. Genau das kommt in deine Mail.</p>
           <div class="cards" id="praiseCards"></div>
           <p class="about-label">Und über dich, falls es stimmt:</p>
           <div class="cards" id="aboutCards"></div>
@@ -354,15 +379,38 @@ const WHEN = [
   { id: "woche",   label: "diese Woche", text: "diese Woche" }
 ];
 
-// Jeder Satz steht genau so auf dem Zettel und genau so in der Mail.
+// Jeder Satz steht so auf dem Zettel und so in der Mail. In der Mail stehen die Sätze
+// immer in dieser Reihenfolge (Geschmack, Portion und Preis, Wunsch für später).
+// Sind beide Sätze einer Gruppe angekreuzt, werden sie mit "und" zu einem Satz verbunden.
 const PRAISE = [
-  { id: "lecker",  text: "Es hat richtig lecker geschmeckt." },
-  { id: "satt",    text: "Ich bin gut satt geworden." },
-  { id: "portion", text: "Die Portion war groß genug." },
-  { id: "preis",   text: "Der Preis war fair." },
-  { id: "wieder",  text: "Ich würde es wieder essen." },
-  { id: "oefter",  text: "Ich würde mich freuen, das öfter auf dem Plan zu sehen." }
+  { id: "lecker",  group: "essen",  text: "Es hat richtig lecker geschmeckt." },
+  { id: "satt",    group: "essen",  text: "Ich bin gut satt geworden." },
+  { id: "portion", group: "preis",  text: "Die Portion war groß genug." },
+  { id: "preis",   group: "preis",  text: "Der Preis war fair." },
+  { id: "wieder",  group: "wunsch", text: "Ich würde es wieder essen." },
+  { id: "oefter",  group: "wunsch", text: "Ich würde mich freuen, das öfter auf dem Plan zu sehen." }
 ];
+const MERGED = {
+  "lecker+satt":   "Es hat richtig lecker geschmeckt und ich bin gut satt geworden.",
+  "portion+preis": "Die Portion war groß genug und der Preis fair.",
+  "wieder+oefter": "Ich würde es wieder essen und mich freuen, das öfter auf dem Plan zu sehen."
+};
+
+// Ausgewählte Sätze -> Satzstücke für die Mail, in fester Reihenfolge, verwandte verbunden.
+function praiseSentences(pickedIds) {
+  const picked = PRAISE.filter(p => (pickedIds || []).includes(p.id));
+  const out = [];
+  const groups = [];
+  picked.forEach(p => { if (!groups.includes(p.group)) groups.push(p.group); });
+  groups.forEach(g => {
+    const items = picked.filter(p => p.group === g);
+    const key = items.map(p => p.id).join("+");
+    out.push(items.length > 1 && MERGED[key]
+      ? { id: key, text: MERGED[key] }
+      : { id: items[0].id, text: items[0].text });
+  });
+  return out;
+}
 const ABOUT = [
   { id: "fleisch", text: "Übrigens: Ich esse sonst Fleisch." }
 ];
@@ -389,7 +437,7 @@ function isoWeek(date) {
   return d.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
 }
 
-/* state: { mensa, when, dish, picked: [ids in Ankreuz-Reihenfolge], about: [ids], own, name } */
+/* state: { mensa, when, dish, picked: [ids], about: [ids], own, name } */
 function buildMail(state) {
   const mensa = MENSEN.find(m => m.id === state.mensa) || null;
   const when = WHEN.find(w => w.id === state.when) || WHEN[0];
@@ -397,9 +445,7 @@ function buildMail(state) {
   const own = cleanOwn(state.own);
   const name = tidy(state.name);
 
-  const praise = (state.picked || [])
-    .map(id => PRAISE.find(p => p.id === id))
-    .filter(Boolean);
+  const praise = praiseSentences(state.picked);
   // Die Angaben über die Person stehen immer am Ende des Absatzes.
   const about = ABOUT.filter(a => (state.about || []).includes(a.id));
   const sentences = praise.concat(about);
@@ -446,6 +492,13 @@ function joinMissing(list) {
   let shown = new Set();     // Sätze, die schon im Brief stehen (für das Aufleuchten)
   let counted = false;       // pro Besuch nur einmal zählen
 
+  function popOnce(el) {
+    el.classList.remove("popping");
+    void el.offsetWidth;            // Animation neu starten
+    el.classList.add("popping");
+    el.addEventListener("animationend", () => el.classList.remove("popping"), { once: true });
+  }
+
   /* ----- Bausteine erzeugen ----- */
   function makeChips(container, items, groupName, key) {
     items.forEach(item => {
@@ -457,6 +510,7 @@ function joinMissing(list) {
       input.addEventListener("change", () => {
         state[key] = item.id;
         container.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === label));
+        popOnce(label);
         render();
       });
       label.append(input, document.createTextNode(item.label));
@@ -476,9 +530,10 @@ function joinMissing(list) {
       txt.textContent = item.text;
       input.addEventListener("change", () => {
         const list = state[listKey].filter(id => id !== item.id);
-        if (input.checked) list.push(item.id);   // Reihenfolge = Reihenfolge des Ankreuzens
+        if (input.checked) list.push(item.id);
         state[listKey] = list;
         label.classList.toggle("on", input.checked);
+        if (input.checked) popOnce(label);
         render();
       });
       label.append(input, box, txt);
