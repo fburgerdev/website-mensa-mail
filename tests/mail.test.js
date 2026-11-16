@@ -13,25 +13,24 @@ let m = api.buildMail({ mensa: "suedstadt", when: "heute", dish: '  „Linsen-Da
 assert.strictEqual(m.ok, true);
 assert.strictEqual(m.subject, "Lob für „Linsen-Dal“ in der Mensa Südstadt");
 assert.strictEqual(m.body,
-  "Hallo,\n\nich habe heute in der Mensa Südstadt das Gericht „Linsen-Dal“ gegessen.\n\nEs hat richtig lecker geschmeckt. Ich würde mich freuen, das öfter auf dem Plan zu sehen.\n\nÜbrigens: Ich esse sonst Fleisch.\n\nDie Soße war super.\n\nGern wieder!\n\nViele Grüße\nLena\n\nZusammengestellt mit der Lob-Seite von Plant-based Universities Köln");
+  "Hallo,\n\nich habe heute in der Mensa Südstadt das Gericht „Linsen-Dal“ gegessen.\n\nEs hat richtig lecker geschmeckt. Ich würde mich freuen, das öfter auf dem Plan zu sehen.\n\nÜbrigens: Ich esse sonst Fleisch.\n\nDie Soße war super.\n\nGern wieder!\n\nViele Grüße\nLena\n\nZusammengestellt mit der Website von Plant-based Universities Köln");
 console.log(m.subject + "\n\n" + m.body + "\n");
 
 // 1b. merging: both sentences of a group become one, in any tick order
 const first = st => api.buildMail({ mensa: "deutz", dish: "X", picked: st, about: [] }).body.split("\n\n")[2];
 assert.strictEqual(first(["satt", "lecker"]), "Es hat richtig lecker geschmeckt und ich bin gut satt geworden.");
-assert.strictEqual(first(["preis", "portion"]), "Die Portion war groß genug und der Preis fair.");
-assert.strictEqual(first(["oefter", "wieder"]), "Ich würde es wieder essen und mich freuen, das öfter auf dem Plan zu sehen.");
-const all = first(["oefter", "preis", "satt", "wieder", "portion", "lecker"]);
-assert.strictEqual(all, "Es hat richtig lecker geschmeckt und ich bin gut satt geworden. Die Portion war groß genug und der Preis fair. Ich würde es wieder essen und mich freuen, das öfter auf dem Plan zu sehen.");
+assert.strictEqual(api.PRAISE.length, 4);
+const all = first(["oefter", "preis", "satt", "lecker"]);
+assert.strictEqual(all, "Es hat richtig lecker geschmeckt und ich bin gut satt geworden. Der Preis war fair. Ich würde mich freuen, das öfter auf dem Plan zu sehen.");
 console.log(all + "\n");
 assert.strictEqual(first(["lecker", "preis", "oefter"]), "Es hat richtig lecker geschmeckt. Der Preis war fair. Ich würde mich freuen, das öfter auf dem Plan zu sehen.");
 
 // 2. nothing added beyond boxes: every sentence in the body is a box text, the intro, greeting, closing
 m = api.buildMail({ mensa: "deutz", when: "woche", dish: "Chili sin Carne", picked: ["satt"], about: [], own: "", name: "" });
-assert.strictEqual(m.body, "Hallo,\n\nich habe diese Woche in der Mensa Deutz das Gericht „Chili sin Carne“ gegessen.\n\nIch bin gut satt geworden.\n\nViele Grüße\n\nZusammengestellt mit der Lob-Seite von Plant-based Universities Köln");
+assert.strictEqual(m.body, "Hallo,\n\nich habe diese Woche in der Mensa Deutz das Gericht „Chili sin Carne“ gegessen.\n\nIch bin gut satt geworden.\n\nViele Grüße\n\nZusammengestellt mit der Website von Plant-based Universities Köln");
 // own words only: no empty praise paragraph
 m = api.buildMail({ mensa: "deutz", dish: "X", picked: [], about: [], own: "Super!" });
-assert.strictEqual(m.body, "Hallo,\n\nich habe heute in der Mensa Deutz das Gericht „X“ gegessen.\n\nSuper!\n\nViele Grüße\n\nZusammengestellt mit der Lob-Seite von Plant-based Universities Köln");
+assert.strictEqual(m.body, "Hallo,\n\nich habe heute in der Mensa Deutz das Gericht „X“ gegessen.\n\nSuper!\n\nViele Grüße\n\nZusammengestellt mit der Website von Plant-based Universities Köln");
 
 // 3. validity
 assert.deepStrictEqual(api.buildMail({ picked: [], about: [] }).missing, ["die Mensa", "das Gericht", "was gut war"]);

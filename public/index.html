@@ -381,20 +381,16 @@ const WHEN = [
 ];
 
 // Jeder Satz steht so auf dem Zettel und so in der Mail. In der Mail stehen die Sätze
-// immer in dieser Reihenfolge (Geschmack, Portion und Preis, Wunsch für später).
+// immer in dieser Reihenfolge (Geschmack, Preis, Wunsch für später).
 // Sind beide Sätze einer Gruppe angekreuzt, werden sie mit "und" zu einem Satz verbunden.
 const PRAISE = [
   { id: "lecker",  group: "essen",  text: "Es hat richtig lecker geschmeckt." },
   { id: "satt",    group: "essen",  text: "Ich bin gut satt geworden." },
-  { id: "portion", group: "preis",  text: "Die Portion war groß genug." },
   { id: "preis",   group: "preis",  text: "Der Preis war fair." },
-  { id: "wieder",  group: "wunsch", text: "Ich würde es wieder essen." },
   { id: "oefter",  group: "wunsch", text: "Ich würde mich freuen, das öfter auf dem Plan zu sehen." }
 ];
 const MERGED = {
-  "lecker+satt":   "Es hat richtig lecker geschmeckt und ich bin gut satt geworden.",
-  "portion+preis": "Die Portion war groß genug und der Preis fair.",
-  "wieder+oefter": "Ich würde es wieder essen und mich freuen, das öfter auf dem Plan zu sehen."
+  "lecker+satt":   "Es hat richtig lecker geschmeckt und ich bin gut satt geworden."
 };
 
 // Ausgewählte Sätze -> Satzstücke für die Mail, in fester Reihenfolge, verwandte verbunden.
@@ -413,7 +409,7 @@ function praiseSentences(pickedIds) {
   return out;
 }
 // Steht unter jeder Mail, damit klar ist, woher sie kommt.
-const SIGNATURE = "Zusammengestellt mit der Lob-Seite von Plant-based Universities Köln";
+const SIGNATURE = "Zusammengestellt mit der Website von Plant-based Universities Köln";
 
 const ABOUT = [
   { id: "fleisch", text: "Übrigens: Ich esse sonst Fleisch." }
