@@ -1,6 +1,6 @@
 # website-mensa-mail
 
-Eine Seite, auf der Studierende in einer Minute eine kurze Lob-Mail an die Mensa-Küche des Kölner Studierendenwerks zusammenstellen, für ein veganes Gericht, das ihnen geschmeckt hat. Die Mail geht aus dem eigenen Mail-Programm raus (`mailto:`). In der Mail steht nur, was angekreuzt oder selbst geschrieben wurde.
+Eine Seite, auf der Studierende in einer Minute eine kurze Lob-Mail an die Mensa-Küche des Kölner Studierendenwerks zusammenstellen, für ein pflanzliches Gericht, das ihnen geschmeckt hat. Die Mail geht aus dem eigenen Mail-Programm raus (`mailto:`). In der Mail steht nur, was angekreuzt oder selbst geschrieben wurde.
 
 Eine Seite von Plant-based Universities Köln.
 

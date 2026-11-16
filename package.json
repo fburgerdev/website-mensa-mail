@@ -1,7 +1,7 @@
 {
   "name": "website-mensa-mail",
   "private": true,
-  "description": "Seite, auf der Studierende der Mensa-Küche des Kölner Studierendenwerks eine kurze Lob-Mail für ein veganes Gericht schreiben.",
+  "description": "Seite, auf der Studierende der Mensa-Küche des Kölner Studierendenwerks eine kurze Lob-Mail für ein pflanzliches Gericht schreiben.",
   "scripts": {
     "test": "node tests/mail.test.js public/index.html"
   }
