@@ -1,26 +1,22 @@
-// Wochenzähler für die Mensa-Lob-Seite. Läuft als Cloudflare Worker mit einem KV-Speicher namens COUNTS.
-// Speichert nur eine Zahl pro Kalenderwoche, nichts über die Leute.
-//   GET  ?week=2026-W47  ->  {"count": 2}
-//   POST ?week=2026-W47  ->  zählt eins hoch, {"count": 3}
-
-const ALLOWED_ORIGIN = "*"; // nach dem Start auf "https://fburgerdev.github.io" setzen
+// Cloudflare Worker für die Mensa-Lob-Seite.
+// Die Seite selbst (public/) liefert Cloudflare direkt aus. Hier landet nur, was keine Datei ist:
+//   GET  /api/count?week=2026-W47  ->  {"count": 2}
+//   POST /api/count?week=2026-W47  ->  zählt eins hoch, {"count": 3}
+// Gespeichert wird nur eine Zahl pro Kalenderwoche im KV-Speicher COUNTS, nichts über die Leute.
 
 function reply(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: {
-      "content-type": "application/json",
-      "cache-control": "no-store",
-      "access-control-allow-origin": ALLOWED_ORIGIN,
-      "access-control-allow-methods": "GET, POST, OPTIONS"
-    }
+    headers: { "content-type": "application/json", "cache-control": "no-store" }
   });
 }
 
 export default {
   async fetch(request, env) {
-    if (request.method === "OPTIONS") return reply({});
-    const week = new URL(request.url).searchParams.get("week") || "";
+    const url = new URL(request.url);
+    if (url.pathname !== "/api/count") return env.ASSETS.fetch(request);
+
+    const week = url.searchParams.get("week") || "";
     if (!/^\d{4}-W\d{2}$/.test(week)) return reply({ error: "week fehlt" }, 400);
 
     const key = "week:" + week;

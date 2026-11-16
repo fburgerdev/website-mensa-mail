@@ -351,10 +351,10 @@ const CONFIG = {
   recipient: "",
   // So viele Mails pro Woche dürfen über die Seite gestartet werden.
   weeklyLimit: 3,
-  // Adresse des Zählers (counter/worker.js, Einrichtung im README). Leer = kein Limit aktiv.
+  // Adresse des Zählers (counter/worker.js). Leer = kein Limit aktiv.
   // Erwartet: GET  <counterUrl>?week=2026-W47  ->  {"count": 2}
   //           POST <counterUrl>?week=2026-W47  ->  zählt eins hoch, {"count": 3}
-  counterUrl: "",
+  counterUrl: "/api/count",
   shareText: "Dir hat ein veganes Gericht in der Mensa geschmeckt? Sag's der Küche, dauert eine Minute:"
 };
 

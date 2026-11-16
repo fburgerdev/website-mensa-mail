@@ -1,6 +1,6 @@
 const fs = require("fs");
 const assert = require("assert");
-const html = fs.readFileSync(process.argv[2] || "index.html", "utf8");
+const html = fs.readFileSync(process.argv[2] || "public/index.html", "utf8");
 const pure = html.split("/*PURE-START*/")[1].split("/*PURE-END*/")[0];
 const api = new Function(pure + "; return { buildMail, mailtoHref, isoWeek, cleanDish, cleanOwn, joinMissing, MENSEN, PRAISE, ABOUT };")();
 
