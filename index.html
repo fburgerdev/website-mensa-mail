@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hat's geschmeckt? Sag's der Küche.</title>
+<meta name="description" content="In einer Minute eine kurze Mail an die Mensa-Küche des Kölner Studierendenwerks: für ein veganes Gericht, das dir geschmeckt hat.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f5d34">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd84a'/%3E%3Cpath d='M14 50c0-22 12-34 36-36 0 24-12 36-36 36z' fill='%231f5d34'/%3E%3Cpath d='M14 50c8-12 16-20 28-28' stroke='%23ffd84a' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --green: #1f5d34;
+    --green-2: #2f7d46;
+    --leaf: #e3f1dc;
+    --yellow: #ffd84a;
+    --yellow-soft: #fff3b8;
+    --cream: #fffbea;
+    --paper: #fffef8;
+    --ink: #1d2b20;
+    --muted: #5d6e61;
+    --hand: 14px 18px 12px 20px / 18px 12px 20px 14px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--cream);
+    background-image: radial-gradient(rgba(31, 93, 52, .13) 1px, transparent 1.3px);
+    background-size: 18px 18px;
+  }
+  .sr {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  [hidden] { display: none !important; }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 1.4rem 1.1rem 3rem; }
+
+  /* ---------- Kopf ---------- */
+  header { padding: .6rem 0 .4rem; }
+  .badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: var(--green); color: var(--cream);
+    font-weight: 700; font-size: .82rem; letter-spacing: .04em; text-transform: uppercase;
+    padding: .3rem .7rem .3rem .55rem; border-radius: var(--hand);
+    transform: rotate(-2deg);
+  }
+  .badge svg { width: 1rem; height: 1rem; }
+  h1 {
+    font-size: clamp(2rem, 8.5vw, 3rem); line-height: 1.08; margin: .9rem 0 .7rem;
+    color: var(--green); letter-spacing: -.02em;
+  }
+  h1 .mark {
+    background: linear-gradient(transparent 55%, var(--yellow) 55%, var(--yellow) 92%, transparent 92%);
+    padding: 0 .12em; margin: 0 -.12em;
+  }
+  .lead { margin: 0 0 .5rem; font-size: 1.06rem; }
+  .rule-note { margin: 0; color: var(--muted); font-size: .95rem; }
+
+  .banner {
+    margin: 1.1rem 0 0; padding: .7rem .9rem; font-size: .92rem;
+    background: var(--yellow-soft); border: 2px dashed #b98a00; border-radius: var(--hand);
+  }
+
+  /* ---------- Schritte ---------- */
+  .step { margin-top: 2.1rem; }
+  .step h2 {
+    display: flex; align-items: center; gap: .65rem;
+    font-size: 1.2rem; margin: 0 0 .9rem; color: var(--green);
+  }
+  .num {
+    flex: none; width: 2rem; height: 2rem; display: grid; place-items: center;
+    background: var(--yellow); color: var(--green); font-weight: 800; font-size: 1.05rem;
+    border: 2px solid var(--green); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
+    transform: rotate(-6deg);
+  }
+  .opt { font-weight: 400; color: var(--muted); font-size: .9rem; }
+  .hint { color: var(--muted); font-size: .92rem; margin: -.4rem 0 .8rem; }
+
+  /* Schnipsel zum Antippen: Mensa, Zeitpunkt */
+  .chips { display: flex; flex-wrap: wrap; gap: .55rem .5rem; }
+  .chip {
+    position: relative; cursor: pointer; user-select: none;
+    padding: .42rem .8rem; background: var(--paper); color: var(--green);
+    border: 2px dashed var(--green-2); border-radius: var(--hand);
+    font-weight: 600; font-size: .97rem;
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform .15s ease, background-color .15s ease, color .15s ease;
+  }
+  .chip:nth-child(3n+1) { --tilt: -1.2deg; }
+  .chip:nth-child(3n+2) { --tilt: .9deg; }
+  .chip:nth-child(3n)   { --tilt: -.4deg; }
+  .chip.on { background: var(--green); color: var(--cream); border-style: solid; border-color: var(--green); transform: rotate(0deg); }
+  .chip:focus-within { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .when { margin-top: 1rem; }
+  .when .chip { font-size: .9rem; padding: .3rem .7rem; }
+
+  /* Textfelder */
+  .field {
+    width: 100%; font: inherit; color: var(--ink);
+    background: var(--paper); padding: .7rem .85rem;
+    border: 2px dashed var(--green-2); border-radius: var(--hand);
+  }
+  .field::placeholder { color: #8a988c; }
+  .field:focus { outline: 3px solid var(--yellow); outline-offset: 2px; border-style: solid; }
+  textarea.field { min-height: 6.2rem; resize: vertical; }
+  .name-row { margin-top: 1.4rem; }
+  .name-row label { display: block; font-weight: 700; color: var(--green); margin-bottom: .45rem; }
+
+  /* Satz-Zettel zum Ankreuzen */
+  .cards { display: grid; gap: .8rem; }
+  .card {
+    display: flex; align-items: flex-start; gap: .75rem; cursor: pointer; user-select: none;
+    padding: .8rem .95rem; background: var(--paper);
+    border: 2px dashed var(--green-2); border-radius: var(--hand);
+    box-shadow: 3px 4px 0 rgba(31, 93, 52, .13);
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease;
+  }
+  .card:nth-child(4n+1) { --tilt: -1.3deg; }
+  .card:nth-child(4n+2) { --tilt: 1deg; margin-left: .5rem; }
+  .card:nth-child(4n+3) { --tilt: -.6deg; margin-right: .6rem; }
+  .card:nth-child(4n)   { --tilt: 1.5deg; margin-left: .2rem; }
+  .card .box {
+    flex: none; width: 1.45rem; height: 1.45rem; margin-top: .05rem;
+    border: 2px dashed var(--green); border-radius: 5px 7px 4px 8px; background: #fff;
+    display: grid; place-items: center;
+  }
+  .card .box::after {
+    content: ""; width: .42rem; height: .78rem; margin-top: -.18rem;
+    border: solid var(--cream); border-width: 0 3px 3px 0;
+    transform: rotate(42deg) scale(0); transition: transform .15s ease;
+  }
+  .card.on {
+    background: var(--yellow); border-style: solid; border-color: var(--green);
+    transform: rotate(0deg); box-shadow: 4px 5px 0 var(--green);
+  }
+  .card.on .box { background: var(--green); border-style: solid; }
+  .card.on .box::after { transform: rotate(42deg) scale(1); }
+  .card:focus-within { outline: 3px solid var(--green); outline-offset: 3px; }
+  .card.about { background: var(--leaf); }
+  .card.about.on { background: var(--yellow); }
+  .about-label { margin: 1.3rem 0 .7rem; font-weight: 700; color: var(--green); font-size: .95rem; }
+
+  /* ---------- Der Brief ---------- */
+  .letter-wrap { margin-top: 2.6rem; }
+  .letter-wrap h2 { font-size: 1.2rem; margin: 0 0 1.2rem; color: var(--green); }
+  .letter {
+    position: relative; background: #fff; padding: 1.7rem 1.25rem 1.4rem;
+    border-radius: 3px; transform: rotate(-.7deg);
+    box-shadow: 0 12px 26px rgba(29, 43, 32, .14), 0 1px 0 rgba(29, 43, 32, .08);
+  }
+  .letter::before {
+    content: ""; position: absolute; top: -13px; left: 50%; width: 112px; height: 27px;
+    background: rgba(255, 216, 74, .88); transform: translateX(-50%) rotate(-2.5deg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+  }
+  .meta { font-size: .85rem; color: var(--muted); border-bottom: 1px dashed #cdd6cd; padding-bottom: .7rem; margin-bottom: 1rem; }
+  .meta div + div { margin-top: .2rem; }
+  .meta b { color: var(--ink); font-weight: 600; }
+  .mail { font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; line-height: 1.6; }
+  .mail p { margin: 0 0 1em; overflow-wrap: anywhere; }
+  .mail p:last-child { margin-bottom: 0; }
+  .mail .own { white-space: pre-wrap; }
+  .gap { color: #8a988c; border-bottom: 2px dashed #b9c6ba; font-style: italic; }
+  .flash { animation: marker 1.4s ease-out; border-radius: 3px; }
+  @keyframes marker { from { background: var(--yellow); } to { background: transparent; } }
+
+  /* ---------- Knöpfe ---------- */
+  .actions { margin-top: 2rem; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    font: inherit; font-weight: 800; cursor: pointer; text-decoration: none;
+    padding: .85rem 1.3rem; border-radius: var(--hand);
+    border: 2px solid var(--green); background: var(--green); color: var(--cream);
+    box-shadow: 5px 5px 0 var(--yellow), 5px 5px 0 2px var(--green);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translate(-1px, -1px); }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--yellow), 2px 2px 0 2px var(--green); }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+  .btn.big { width: 100%; font-size: 1.15rem; padding: 1rem 1.3rem; }
+  .btn.ghost { background: var(--paper); color: var(--green); box-shadow: 3px 3px 0 rgba(31, 93, 52, .2); font-weight: 700; padding: .6rem 1rem; font-size: .97rem; }
+  .btn[aria-disabled="true"] {
+    background: #e9ecdf; color: #7d8a7f; border: 2px dashed #a9b5aa; box-shadow: none; cursor: not-allowed; transform: none;
+  }
+  .todo { margin: .9rem 0 0; color: var(--muted); font-size: .93rem; text-align: center; min-height: 1.4em; }
+
+  .panel {
+    margin-top: 2rem; padding: 1.2rem 1.1rem; background: var(--leaf);
+    border: 2px solid var(--green); border-radius: var(--hand);
+  }
+  .panel h2 { margin: 0 0 .5rem; font-size: 1.2rem; color: var(--green); }
+  .panel p { margin: 0 0 .8rem; }
+  .panel p:last-child { margin-bottom: 0; }
+  .panel .row { display: flex; flex-wrap: wrap; gap: .7rem; margin: .2rem 0 1rem; }
+  .panel hr { border: 0; border-top: 2px dashed var(--green-2); margin: 1.1rem 0; opacity: .6; }
+  .addr { font-weight: 700; overflow-wrap: anywhere; }
+  .closed { background: var(--yellow-soft); }
+
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 2px dashed var(--green-2); color: var(--muted); font-size: .88rem; }
+  footer p { margin: 0 0 .4rem; }
+  footer strong { color: var(--green); }
+
+  /* Breite Bildschirme: Brief bleibt rechts stehen */
+  @media (min-width: 940px) {
+    .wrap { max-width: 1040px; }
+    .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.2rem; align-items: start; }
+    .side { position: sticky; top: 1.2rem; }
+    .letter-wrap { margin-top: 2.1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 10 10 4 21 3c0 11-6 17-17 17z" fill="#ffd84a"/><path d="M4 20c4-6 8-10 13-13" stroke="#1f5d34" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      Vegan in der Mensa
+    </span>
+    <h1>Hat's geschmeckt? <span class="mark">Sag's der Küche.</span></h1>
+    <p class="lead">Wer in der Mensa zufrieden war, schreibt fast nie. Hier baust du in einer Minute eine kurze Mail an die Küche des Kölner Studierendenwerks: für ein veganes Gericht, das dir geschmeckt hat.</p>
+    <p class="rule-note">Du kreuzt an, was stimmt. In der Mail steht nur, was du auswählst oder selbst schreibst.</p>
+    <p class="banner" id="testBanner" hidden><strong>Testversion:</strong> Die Empfängeradresse ist noch nicht eingetragen. Die Mail öffnet sich ohne Empfänger.</p>
+  </header>
+
+  <noscript><p class="banner">Diese Seite braucht JavaScript, um deine Mail zusammenzusetzen.</p></noscript>
+
+  <section class="panel closed" id="closedPanel" hidden>
+    <h2>Diese Woche sind schon genug Mails unterwegs.</h2>
+    <p>Damit die Küche nicht überrollt wird, gehen über diese Seite nur <span id="limitNumber">3</span> Mails pro Woche raus. Komm nächste Woche wieder, dann ist wieder Platz für deine!</p>
+  </section>
+
+  <main id="builder">
+    <div class="cols">
+      <div class="main-col">
+
+        <section class="step" aria-labelledby="h-mensa">
+          <h2 id="h-mensa"><span class="num" aria-hidden="true">1</span>Wo hast du gegessen?</h2>
+          <div class="chips" id="mensaChips" role="radiogroup" aria-labelledby="h-mensa"></div>
+          <div class="chips when" id="whenChips" role="radiogroup" aria-label="Wann war das?"></div>
+        </section>
+
+        <section class="step" aria-labelledby="h-dish">
+          <h2 id="h-dish"><span class="num" aria-hidden="true">2</span><label for="dish">Welches vegane Gericht war's?</label></h2>
+          <input class="field" id="dish" type="text" maxlength="80" autocomplete="off" placeholder="z. B. Linsen-Dal mit Reis">
+        </section>
+
+        <section class="step" aria-labelledby="h-good">
+          <h2 id="h-good"><span class="num" aria-hidden="true">3</span>Was war gut?</h2>
+          <p class="hint">Kreuz an, was stimmt. Jeder Satz kommt genau so in deine Mail.</p>
+          <div class="cards" id="praiseCards"></div>
+          <p class="about-label">Und über dich, falls es stimmt:</p>
+          <div class="cards" id="aboutCards"></div>
+        </section>
+
+        <section class="step" aria-labelledby="h-own">
+          <h2 id="h-own"><span class="num" aria-hidden="true">4</span><label for="own">In deinen eigenen Worten <span class="opt">(freiwillig)</span></label></h2>
+          <p class="hint">Ein eigener Satz wirkt am meisten.</p>
+          <textarea class="field" id="own" maxlength="600" placeholder="Geschmack? Würzung? Was war besonders?"></textarea>
+          <div class="name-row">
+            <label for="name">Dein Vorname <span class="opt">(freiwillig)</span></label>
+            <input class="field" id="name" type="text" maxlength="40" autocomplete="given-name" placeholder="z. B. Lena">
+          </div>
+        </section>
+
+      </div>
+
+      <div class="side">
+        <section class="letter-wrap" aria-labelledby="h-letter">
+          <h2 id="h-letter">Deine Mail</h2>
+          <div class="letter" aria-live="polite">
+            <div class="meta">
+              <div>An: <b id="pvTo"></b></div>
+              <div>Betreff: <b id="pvSubject"></b></div>
+            </div>
+            <div class="mail" id="pvBody"></div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <a class="btn big" id="openMail" href="#" role="button" aria-disabled="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Mail öffnen
+          </a>
+          <p class="todo" id="todo"></p>
+        </div>
+
+        <section class="panel" id="donePanel" hidden tabindex="-1">
+          <h2>Fast geschafft!</h2>
+          <p>Deine Mail liegt fertig in deinem Mail-Programm. Jetzt nur noch auf <strong>Senden</strong> tippen.</p>
+          <p>Kein Mail-Programm aufgegangen? Kopier den Text und schick ihn selbst<span id="addrLine"> an <span class="addr" id="addrText"></span></span>.</p>
+          <div class="row">
+            <button class="btn ghost" id="copyText" type="button">Text kopieren</button>
+          </div>
+          <hr>
+          <p><strong>Wer hat mit dir gegessen?</strong> Schick den Link weiter.</p>
+          <div class="row">
+            <a class="btn ghost" id="shareWa" href="#" target="_blank" rel="noopener">Per WhatsApp schicken</a>
+            <button class="btn ghost" id="copyLink" type="button">Link kopieren</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p><strong>Eine Seite von Plant-based Universities Köln.</strong></p>
+    <p>Diese Seite speichert nichts über dich. Deine Mail geht aus deinem eigenen Postfach raus.<span id="countNote" hidden> Gezählt wird nur, wie viele Mails pro Woche gestartet werden.</span></p>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Einstellungen
+   ============================================================ */
+const CONFIG = {
+  // Empfängeradresse. Leer = Testmodus (die Mail öffnet sich ohne Empfänger).
+  recipient: "",
+  // So viele Mails pro Woche dürfen über die Seite gestartet werden.
+  weeklyLimit: 3,
+  // Adresse des Zählers (counter/worker.js, Einrichtung im README). Leer = kein Limit aktiv.
+  // Erwartet: GET  <counterUrl>?week=2026-W47  ->  {"count": 2}
+  //           POST <counterUrl>?week=2026-W47  ->  zählt eins hoch, {"count": 3}
+  counterUrl: "",
+  shareText: "Dir hat ein veganes Gericht in der Mensa geschmeckt? Sag's der Küche, dauert eine Minute:"
+};
+
+/*PURE-START*/
+const MENSEN = [
+  { id: "zuelpicher",   label: "Zülpicher Straße",          name: "Mensa Zülpicher Straße" },
+  { id: "lindenthal",   label: "Lindenthal",                name: "Mensa Lindenthal" },
+  { id: "zollstock",    label: "Zollstock",                 name: "Mensa Zollstock" },
+  { id: "suedstadt",    label: "Südstadt",                  name: "Mensa Südstadt" },
+  { id: "claudius",     label: "Claudiusstraße",            name: "Mensa Claudiusstraße" },
+  { id: "deutz",        label: "Deutz",                     name: "Mensa Deutz" },
+  { id: "spoho",        label: "Sporthochschule",           name: "Mensa Sporthochschule" },
+  { id: "musik",        label: "Musikhochschule",           name: "Mensa Musikhochschule" },
+  { id: "khm",          label: "Kunsthochschule für Medien", name: "Mensa Kunsthochschule für Medien" },
+  { id: "gummersbach",  label: "Gummersbach",               name: "Mensa Gummersbach" },
+  { id: "leverkusen",   label: "Leverkusen",                name: "Mensa Leverkusen" }
+];
+
+const WHEN = [
+  { id: "heute",   label: "heute",       text: "heute" },
+  { id: "gestern", label: "gestern",     text: "gestern" },
+  { id: "woche",   label: "diese Woche", text: "diese Woche" }
+];
+
+// Jeder Satz steht genau so auf dem Zettel und genau so in der Mail.
+const PRAISE = [
+  { id: "lecker",  text: "Es hat richtig lecker geschmeckt." },
+  { id: "satt",    text: "Ich bin gut satt geworden." },
+  { id: "portion", text: "Die Portion war groß genug." },
+  { id: "preis",   text: "Der Preis war fair." },
+  { id: "wieder",  text: "Ich würde es wieder essen." },
+  { id: "oefter",  text: "Ich würde mich freuen, das öfter auf dem Plan zu sehen." }
+];
+const ABOUT = [
+  { id: "fleisch", text: "Übrigens: Ich esse sonst Fleisch." }
+];
+
+function tidy(s) {
+  return String(s || "").replace(/\s+/g, " ").trim();
+}
+
+function cleanDish(s) {
+  return tidy(s).replace(/^["'„“”‚‘’«»]+|["'„“”‚‘’«»]+$/g, "").trim();
+}
+
+function cleanOwn(s) {
+  return String(s || "").replace(/\r\n?/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+// ISO-Kalenderwoche, z. B. "2026-W47"
+function isoWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  return d.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
+}
+
+/* state: { mensa, when, dish, picked: [ids in Ankreuz-Reihenfolge], about: [ids], own, name } */
+function buildMail(state) {
+  const mensa = MENSEN.find(m => m.id === state.mensa) || null;
+  const when = WHEN.find(w => w.id === state.when) || WHEN[0];
+  const dish = cleanDish(state.dish);
+  const own = cleanOwn(state.own);
+  const name = tidy(state.name);
+
+  const praise = (state.picked || [])
+    .map(id => PRAISE.find(p => p.id === id))
+    .filter(Boolean);
+  // Die Angaben über die Person stehen immer am Ende des Absatzes.
+  const about = ABOUT.filter(a => (state.about || []).includes(a.id));
+  const sentences = praise.concat(about);
+
+  const missing = [];
+  if (!mensa) missing.push("die Mensa");
+  if (!dish) missing.push("das Gericht");
+  if (!praise.length && !own) missing.push("was gut war");
+
+  const intro = "ich habe " + when.text + " in der " + (mensa ? mensa.name : "…") +
+    " das Gericht „" + (dish || "…") + "“ gegessen.";
+  const subject = "Lob für „" + (dish || "…") + "“ in der " + (mensa ? mensa.name : "…");
+
+  const first = [intro].concat(sentences.map(s => s.text)).join(" ");
+  const parts = ["Hallo,", first];
+  if (own) parts.push(own);
+  parts.push("Viele Grüße" + (name ? "\n" + name : ""));
+
+  return {
+    ok: missing.length === 0,
+    missing, mensa, when, dish, own, name, sentences, intro, subject,
+    body: parts.join("\n\n")
+  };
+}
+
+function mailtoHref(recipient, subject, body) {
+  return "mailto:" + encodeURIComponent(recipient || "").replace(/%40/g, "@") +
+    "?subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(body.replace(/\n/g, "\r\n"));
+}
+
+function joinMissing(list) {
+  if (list.length <= 1) return list.join("");
+  return list.slice(0, -1).join(", ") + " und " + list[list.length - 1];
+}
+/*PURE-END*/
+
+/* ============================================================
+   Seite
+   ============================================================ */
+(function () {
+  const $ = id => document.getElementById(id);
+  const state = { mensa: "", when: "heute", dish: "", picked: [], about: [], own: "", name: "" };
+  let shown = new Set();     // Sätze, die schon im Brief stehen (für das Aufleuchten)
+  let counted = false;       // pro Besuch nur einmal zählen
+
+  /* ----- Bausteine erzeugen ----- */
+  function makeChips(container, items, groupName, key) {
+    items.forEach(item => {
+      const label = document.createElement("label");
+      label.className = "chip";
+      const input = document.createElement("input");
+      input.type = "radio"; input.name = groupName; input.value = item.id; input.className = "sr";
+      if (state[key] === item.id) { input.checked = true; label.classList.add("on"); }
+      input.addEventListener("change", () => {
+        state[key] = item.id;
+        container.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === label));
+        render();
+      });
+      label.append(input, document.createTextNode(item.label));
+      container.append(label);
+    });
+  }
+
+  function makeCards(container, items, listKey, extraClass) {
+    items.forEach(item => {
+      const label = document.createElement("label");
+      label.className = "card" + (extraClass ? " " + extraClass : "");
+      const input = document.createElement("input");
+      input.type = "checkbox"; input.value = item.id; input.className = "sr";
+      const box = document.createElement("span");
+      box.className = "box"; box.setAttribute("aria-hidden", "true");
+      const txt = document.createElement("span");
+      txt.textContent = item.text;
+      input.addEventListener("change", () => {
+        const list = state[listKey].filter(id => id !== item.id);
+        if (input.checked) list.push(item.id);   // Reihenfolge = Reihenfolge des Ankreuzens
+        state[listKey] = list;
+        label.classList.toggle("on", input.checked);
+        render();
+      });
+      label.append(input, box, txt);
+      container.append(label);
+    });
+  }
+
+  makeChips($("mensaChips"), MENSEN, "mensa", "mensa");
+  makeChips($("whenChips"), WHEN, "when", "when");
+  makeCards($("praiseCards"), PRAISE, "picked", "");
+  makeCards($("aboutCards"), ABOUT, "about", "about");
+
+  $("dish").addEventListener("input", e => { state.dish = e.target.value; render(); });
+  $("own").addEventListener("input", e => { state.own = e.target.value; render(); });
+  $("name").addEventListener("input", e => { state.name = e.target.value; render(); });
+
+  /* ----- Brief anzeigen ----- */
+  function span(text, cls) {
+    const s = document.createElement("span");
+    if (cls) s.className = cls;
+    s.textContent = text;
+    return s;
+  }
+  function para(...nodes) {
+    const p = document.createElement("p");
+    nodes.forEach(n => p.append(n));
+    return p;
+  }
+
+  function render() {
+    const mail = buildMail(state);
+    const body = $("pvBody");
+    body.textContent = "";
+
+    $("pvTo").textContent = CONFIG.recipient || "(noch nicht eingetragen)";
+    const subj = $("pvSubject");
+    subj.textContent = "";
+    subj.append("Lob für „", mail.dish ? mail.dish : span("Gericht", "gap"), "“ in der ",
+      mail.mensa ? mail.mensa.name : span("Mensa", "gap"));
+
+    body.append(para("Hallo,"));
+
+    const first = para(
+      "ich habe " + mail.when.text + " in der ",
+      mail.mensa ? mail.mensa.name : span("Mensa wählen", "gap"),
+      " das Gericht „",
+      mail.dish ? mail.dish : span("Gericht eintragen", "gap"),
+      "“ gegessen."
+    );
+    const nowShown = new Set();
+    mail.sentences.forEach(s => {
+      nowShown.add(s.id);
+      first.append(" ", span(s.text, shown.has(s.id) ? "" : "flash"));
+    });
+    if (!mail.sentences.length && !mail.own) first.append(" ", span("Was war gut?", "gap"));
+    shown = nowShown;
+    body.append(first);
+
+    if (mail.own) {
+      const p = para(mail.own);
+      p.className = "own";
+      body.append(p);
+    }
+
+    const bye = para("Viele Grüße");
+    if (mail.name) { bye.append(document.createElement("br"), mail.name); }
+    body.append(bye);
+
+    const btn = $("openMail");
+    btn.setAttribute("aria-disabled", mail.ok ? "false" : "true");
+    btn.href = mail.ok ? mailtoHref(CONFIG.recipient, mail.subject, mail.body) : "#";
+    $("todo").textContent = mail.ok
+      ? "Die Mail öffnet sich in deinem Mail-Programm. Abschicken tust du sie selbst."
+      : "Es fehlt noch: " + joinMissing(mail.missing) + ".";
+    return mail;
+  }
+
+  /* ----- Zähler und Wochenlimit ----- */
+  function counterEndpoint() {
+    return CONFIG.counterUrl + (CONFIG.counterUrl.includes("?") ? "&" : "?") + "week=" + isoWeek(new Date());
+  }
+  async function checkLimit() {
+    if (!CONFIG.counterUrl) return;
+    $("countNote").hidden = false;
+    try {
+      const res = await fetch(counterEndpoint(), { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (typeof data.count === "number" && data.count >= CONFIG.weeklyLimit) {
+        $("limitNumber").textContent = CONFIG.weeklyLimit;
+        $("closedPanel").hidden = false;
+        $("builder").hidden = true;
+      }
+    } catch (e) { /* Zähler nicht erreichbar: Seite bleibt offen */ }
+  }
+  function countOnce() {
+    if (!CONFIG.counterUrl || counted) return;
+    counted = true;
+    try { fetch(counterEndpoint(), { method: "POST", keepalive: true }).catch(() => {}); } catch (e) {}
+  }
+
+  /* ----- Knöpfe ----- */
+  async function copy(text, button, doneLabel) {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.append(ta); ta.select();
+      try { ok = document.execCommand("copy"); } catch (e2) {}
+      ta.remove();
+    }
+    const old = button.textContent;
+    button.textContent = ok ? doneLabel : "Kopieren hat nicht geklappt";
+    setTimeout(() => { button.textContent = old; }, 2200);
+  }
+
+  $("openMail").addEventListener("click", e => {
+    const mail = render();
+    if (!mail.ok) { e.preventDefault(); return; }
+    countOnce();
+    // Der Link selbst öffnet das Mail-Programm. Danach den Abschluss zeigen.
+    setTimeout(() => {
+      const done = $("donePanel");
+      done.hidden = false;
+      done.scrollIntoView({ behavior: "smooth", block: "start" });
+      done.focus({ preventScroll: true });
+    }, 600);
+  });
+
+  $("copyText").addEventListener("click", e => {
+    const mail = render();
+    if (!mail.ok) return;
+    countOnce();
+    copy("Betreff: " + mail.subject + "\n\n" + mail.body, e.currentTarget, "Kopiert!");
+  });
+
+  const pageUrl = location.href.split("#")[0];
+  $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(CONFIG.shareText + " " + pageUrl);
+  $("copyLink").addEventListener("click", e => copy(pageUrl, e.currentTarget, "Link kopiert!"));
+
+  /* ----- Start ----- */
+  $("testBanner").hidden = !!CONFIG.recipient;
+  $("addrLine").hidden = !CONFIG.recipient;
+  $("addrText").textContent = CONFIG.recipient;
+  render();
+  checkLimit();
+})();
+</script>
+</body>
+</html>
