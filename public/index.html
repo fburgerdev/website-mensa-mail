@@ -190,6 +190,7 @@
   .mail p { margin: 0 0 1em; overflow-wrap: anywhere; }
   .mail p:last-child { margin-bottom: 0; }
   .mail .own { white-space: pre-wrap; }
+  .mail .sig { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: .82rem; color: var(--muted); }
   .gap { color: #8a988c; border-bottom: 2px dashed #b9c6ba; font-style: italic; }
   .flash { animation: marker 1.4s ease-out; border-radius: 3px; }
   @keyframes marker { from { background: var(--yellow); } to { background: transparent; } }
@@ -252,7 +253,7 @@
     </span>
     <h1>Hat's geschmeckt? <span class="mark">Sag's der Küche.</span></h1>
     <p class="lead">Wer in der Mensa zufrieden war, schreibt fast nie. Hier baust du in einer Minute eine kurze Mail an die Küche des Kölner Studierendenwerks: für ein pflanzliches Gericht, das dir geschmeckt hat.</p>
-    <p class="rule-note">Du kreuzt an, was stimmt. In der Mail steht nur, was du auswählst oder selbst schreibst.</p>
+    <p class="rule-note">Du kreuzt an, was stimmt. In der Mail steht nur, was du auswählst oder selbst schreibst, und unten ein kurzer Hinweis auf diese Seite.</p>
     <p class="banner" id="testBanner" hidden><strong>Testversion:</strong> Die Empfängeradresse ist noch nicht eingetragen. Die Mail öffnet sich ohne Empfänger.</p>
   </header>
 
@@ -411,6 +412,9 @@ function praiseSentences(pickedIds) {
   });
   return out;
 }
+// Steht unter jeder Mail, damit klar ist, woher sie kommt.
+const SIGNATURE = "Zusammengestellt mit der Lob-Seite von Plant-based Universities Köln";
+
 const ABOUT = [
   { id: "fleisch", text: "Übrigens: Ich esse sonst Fleisch." }
 ];
@@ -459,14 +463,17 @@ function buildMail(state) {
     " das Gericht „" + (dish || "…") + "“ gegessen.";
   const subject = "Lob für „" + (dish || "…") + "“ in der " + (mensa ? mensa.name : "…");
 
-  const first = [intro].concat(sentences.map(s => s.text)).join(" ");
-  const parts = ["Hallo,", first];
+  // Absätze: Anlass, Lob, Angabe über die Person, eigene Worte, Gruß, Hinweis auf die Seite.
+  const parts = ["Hallo,", intro];
+  if (praise.length) parts.push(praise.map(s => s.text).join(" "));
+  if (about.length) parts.push(about.map(s => s.text).join(" "));
   if (own) parts.push(own);
   parts.push("Viele Grüße" + (name ? "\n" + name : ""));
+  parts.push(SIGNATURE);
 
   return {
     ok: missing.length === 0,
-    missing, mensa, when, dish, own, name, sentences, intro, subject,
+    missing, mensa, when, dish, own, name, praise, about, sentences, intro, subject,
     body: parts.join("\n\n")
   };
 }
@@ -576,21 +583,28 @@ function joinMissing(list) {
 
     body.append(para("Hallo,"));
 
-    const first = para(
+    body.append(para(
       "ich habe " + mail.when.text + " in der ",
       mail.mensa ? mail.mensa.name : span("Mensa wählen", "gap"),
       " das Gericht „",
       mail.dish ? mail.dish : span("Gericht eintragen", "gap"),
       "“ gegessen."
-    );
+    ));
+
     const nowShown = new Set();
-    mail.sentences.forEach(s => {
-      nowShown.add(s.id);
-      first.append(" ", span(s.text, shown.has(s.id) ? "" : "flash"));
-    });
-    if (!mail.sentences.length && !mail.own) first.append(" ", span("Was war gut?", "gap"));
+    function sentencePara(list) {
+      const p = para();
+      list.forEach((s, i) => {
+        nowShown.add(s.id);
+        if (i) p.append(" ");
+        p.append(span(s.text, shown.has(s.id) ? "" : "flash"));
+      });
+      return p;
+    }
+    if (mail.praise.length) body.append(sentencePara(mail.praise));
+    else if (!mail.own) body.append(para(span("Was war gut?", "gap")));
+    if (mail.about.length) body.append(sentencePara(mail.about));
     shown = nowShown;
-    body.append(first);
 
     if (mail.own) {
       const p = para(mail.own);
@@ -601,6 +615,9 @@ function joinMissing(list) {
     const bye = para("Viele Grüße");
     if (mail.name) { bye.append(document.createElement("br"), mail.name); }
     body.append(bye);
+    const sig = para(SIGNATURE);
+    sig.className = "sig";
+    body.append(sig);
 
     const btn = $("openMail");
     btn.setAttribute("aria-disabled", mail.ok ? "false" : "true");
