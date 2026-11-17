@@ -460,7 +460,7 @@ function buildMail(state) {
   const subject = "Lob für „" + (dish || "…") + "“ in der " + (mensa ? mensa.name : "…");
 
   // Absätze: Anlass, Lob, Angabe über die Person, eigene Worte, Gruß, Hinweis auf die Seite.
-  const parts = ["Hallo,", intro];
+  const parts = ["Liebes Mensa-Team,", intro];
   if (praise.length) parts.push(praise.map(s => s.text).join(" "));
   if (about.length) parts.push(about.map(s => s.text).join(" "));
   if (own) parts.push(own);
@@ -577,7 +577,7 @@ function joinMissing(list) {
     subj.append("Lob für „", mail.dish ? mail.dish : span("Gericht", "gap"), "“ in der ",
       mail.mensa ? mail.mensa.name : span("Mensa", "gap"));
 
-    body.append(para("Hallo,"));
+    body.append(para("Liebes Mensa-Team,"));
 
     body.append(para(
       "ich habe " + mail.when.text + " in der ",
